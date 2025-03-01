@@ -41,6 +41,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat_id = update.message.chat_id
     message_text = update.message.text
+    # Сохраняем сообщение в базу данных
+    await save_message_to_db(chat_id, message_text)
+
+    # Отправляем подтверждение пользователю
+    await update.message.reply_text(f'Вы сказали: {message_text}')
+    await update.message.reply_text('Ваше сообщение сохранено в базе данных!')
+
 
 # Обработчик текстовых сообщений
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -55,7 +62,6 @@ def main() -> None:
     # Регистрируем обработчик команды /start
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-
     # Регистрируем обработчик текстовых сообщений
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
